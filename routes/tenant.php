@@ -23,9 +23,7 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-    Route::get('/', function () {
-        return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
-    });
+    Route::get('/', [\App\Http\Controllers\TenantFrontendController::class, 'index'])->name('tenant.index');
 
     Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('booking.store');
     Route::get('/bookings/{id}', [\App\Http\Controllers\BookingController::class, 'show'])->name('booking.show');

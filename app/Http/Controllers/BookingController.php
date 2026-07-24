@@ -47,9 +47,8 @@ class BookingController extends Controller
             ->where('id', $id)
             ->firstOrFail();
 
-        return response()->json([
+        return \Inertia\Inertia::render('Booking/Show', [
             'serial' => $serial
         ]);
-        // For Inertia we would do: return Inertia::render('Booking/Show', ['serial' => $serial]);
     }
 }
