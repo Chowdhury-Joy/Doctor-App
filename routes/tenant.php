@@ -26,4 +26,8 @@ Route::middleware([
     Route::get('/', function () {
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
     });
+
+    Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('booking.store');
+    Route::get('/bookings/{id}', [\App\Http\Controllers\BookingController::class, 'show'])->name('booking.show');
+    Route::get('/queue/status/{sessionId}', [\App\Http\Controllers\QueueController::class, 'status'])->name('queue.status');
 });
