@@ -113,6 +113,12 @@ class SerialResource extends Resource
                     ->color('success')
                     ->visible(fn (Serial $record) => $record->status === 'in_chamber')
                     ->action(fn (Serial $record) => $record->update(['status' => 'completed'])),
+                Tables\Actions\Action::make('whatsapp')
+                    ->label('WhatsApp')
+                    ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+                    ->color('success')
+                    ->url(fn (Serial $record) => $record->whatsapp_link)
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
