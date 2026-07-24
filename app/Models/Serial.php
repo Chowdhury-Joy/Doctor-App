@@ -10,7 +10,7 @@ class Serial extends Model
 {
     use HasUuids, BelongsToTenant;
 
-    protected $guarded = [];
+    protected $fillable = ['id', 'tenant_id', 'doctor_id', 'chamber_id', 'schedule_session_id', 'booking_date', 'patient_name', 'patient_phone', 'serial_number', 'status', 'payment_status', 'payment_reference'];
 
     /**
      * Get a WhatsApp deep link to message the patient about their booking.
@@ -28,5 +28,20 @@ class Serial extends Model
         $message = urlencode("Hello {$this->patient_name}, your booking (Serial #{$this->serial_number}) for {$this->booking_date} is confirmed. View your live ticket here: " . route('booking.show', $this->id));
         
         return "https://wa.me/{$phone}?text={$message}";
+    }
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
+    public function chamber()
+    {
+        return $this->belongsTo(Chamber::class);
+    }
+
+    public function scheduleSession()
+    {
+        return $this->belongsTo(ScheduleSession::class);
     }
 }

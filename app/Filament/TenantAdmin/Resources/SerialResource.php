@@ -23,15 +23,15 @@ class SerialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('doctor_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('chamber_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('schedule_session_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('doctor_id')
+                    ->relationship('doctor', 'name')
+                    ->required(),
+                Forms\Components\Select::make('chamber_id')
+                    ->relationship('chamber', 'name')
+                    ->required(),
+                Forms\Components\Select::make('schedule_session_id')
+                    ->relationship('scheduleSession', 'session_name')
+                    ->required(),
                 Forms\Components\DatePicker::make('booking_date')
                     ->required(),
                 Forms\Components\TextInput::make('patient_name')
@@ -63,7 +63,7 @@ class SerialResource extends Resource
                     ->label('ID')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tenant_id')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('doctor_id')
                     ->numeric()
                     ->sortable(),

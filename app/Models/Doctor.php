@@ -9,5 +9,5 @@ class Doctor extends Model
 {
     use BelongsToTenant;
 
-    protected $guarded = [];
+    protected $fillable = ['tenant_id', 'name', 'specialty'];
 }

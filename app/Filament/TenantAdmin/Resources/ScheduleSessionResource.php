@@ -23,12 +23,12 @@ class ScheduleSessionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('chamber_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('doctor_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('chamber_id')
+                    ->relationship('chamber', 'name')
+                    ->required(),
+                Forms\Components\Select::make('doctor_id')
+                    ->relationship('doctor', 'name')
+                    ->required(),
                 Forms\Components\TextInput::make('day_of_week')
                     ->required()
                     ->numeric(),
@@ -48,7 +48,7 @@ class ScheduleSessionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('tenant_id')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('chamber_id')
                     ->numeric()
                     ->sortable(),

@@ -10,5 +10,5 @@ class Chamber extends Model
 {
     use BelongsToTenant;
 
-    protected $guarded = [];
+    protected $fillable = ['tenant_id', 'name', 'location', 'hours'];
 }

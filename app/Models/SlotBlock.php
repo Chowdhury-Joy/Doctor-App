@@ -9,5 +9,5 @@ class SlotBlock extends Model
 {
     use BelongsToTenant;
 
-    protected $guarded = [];
+    protected $fillable = ['tenant_id', 'doctor_id', 'chamber_id', 'block_date', 'reason'];
 }
