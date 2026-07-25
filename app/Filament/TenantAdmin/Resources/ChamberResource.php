@@ -6,7 +6,7 @@ use App\Filament\TenantAdmin\Resources\ChamberResource\Pages;
 use App\Filament\TenantAdmin\Resources\ChamberResource\RelationManagers;
 use App\Models\Chamber;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,9 +17,9 @@ class ChamberResource extends Resource
 {
     protected static ?string $model = Chamber::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([

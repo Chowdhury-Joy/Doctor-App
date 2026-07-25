@@ -6,7 +6,7 @@ use App\Filament\TenantAdmin\Resources\SerialResource\Pages;
 use App\Filament\TenantAdmin\Resources\SerialResource\RelationManagers;
 use App\Models\Serial;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,18 +17,25 @@ class SerialResource extends Resource
 {
     protected static ?string $model = Serial::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function canCreate(): bool
+    {
+        return tenant('billing_status') !== 'read_only';
+    }
+
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('doctor_id')
                     ->relationship('doctor', 'name')
-                    ->required(),
+                    ->required()
+                    ->hiddenOn('create'),
                 Forms\Components\Select::make('chamber_id')
                     ->relationship('chamber', 'name')
-                    ->required(),
+                    ->required()
+                    ->hiddenOn('create'),
                 Forms\Components\Select::make('schedule_session_id')
                     ->relationship('scheduleSession', 'session_name')
                     ->required(),
@@ -43,15 +50,19 @@ class SerialResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('serial_number')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->hiddenOn('create'),
                 Forms\Components\TextInput::make('status')
-                    ->required(),
+                    ->required()
+                    ->hiddenOn('create'),
                 Forms\Components\TextInput::make('payment_status')
                     ->required()
                     ->maxLength(255)
-                    ->default('unpaid'),
+                    ->default('unpaid')
+                    ->hiddenOn('create'),
                 Forms\Components\TextInput::make('payment_reference')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->hiddenOn('create'),
             ]);
     }
 

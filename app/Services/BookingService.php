@@ -31,18 +31,40 @@ class BookingService
                 throw new Exception('This date is blocked by the doctor.');
             }
 
-            // Count existing bookings for this session on this date
-            $existingBookingsCount = Serial::where('schedule_session_id', $session->id)
-                ->where('booking_date', $date)
-                ->where('status', '!=', 'cancelled')
-                ->count();
+            // Determine slot cap type from tenant settings
+            $tenant = tenant();
+            $slotCapType = $tenant->data['slot_cap_type'] ?? 'session';
+            $dailyCap = $tenant->data['daily_slot_cap'] ?? 20;
 
-            if ($existingBookingsCount >= $session->slot_cap) {
-                throw new Exception('No slots available for this session.');
+            if ($slotCapType === 'day') {
+                $existingBookingsCount = Serial::where('booking_date', $date)
+                    ->where('status', '!=', 'cancelled')
+                    ->count();
+
+                if ($existingBookingsCount >= $dailyCap) {
+                    throw new Exception('Daily slot limit reached.');
+                }
+
+                // Still need to calculate session-specific next serial number
+                $sessionBookingsCount = Serial::where('schedule_session_id', $session->id)
+                    ->where('booking_date', $date)
+                    ->where('status', '!=', 'cancelled')
+                    ->count();
+                $nextSerialNumber = $sessionBookingsCount + 1;
+            } else {
+                // Count existing bookings for this session on this date
+                $sessionBookingsCount = Serial::where('schedule_session_id', $session->id)
+                    ->where('booking_date', $date)
+                    ->where('status', '!=', 'cancelled')
+                    ->count();
+
+                if ($sessionBookingsCount >= $session->slot_cap) {
+                    throw new Exception('No slots available for this session.');
+                }
+                
+                $nextSerialNumber = $sessionBookingsCount + 1;
             }
 
-            // Determine the next serial number
-            $nextSerialNumber = $existingBookingsCount + 1;
 
             // Create the booking
             $serial = Serial::create([

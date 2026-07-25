@@ -13,6 +13,15 @@
         <!-- Scripts -->
         @routes
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
+        
+        <!-- PWA Manifest and Service Worker -->
+        <link rel="manifest" href="{{ route('tenant.manifest') }}">
+        <script src="/build/registerSW.js"></script>
+
+        @if(tenant('custom_code_approved_at') && tenant('custom_code'))
+            {!! tenant('custom_code') !!}
+        @endif
+
         @inertiaHead
     </head>
     <body class="font-sans antialiased">

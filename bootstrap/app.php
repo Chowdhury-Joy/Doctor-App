@@ -10,6 +10,11 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            if (file_exists(base_path('routes/tenant.php'))) {
+                require base_path('routes/tenant.php');
+            }
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
@@ -19,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'payment/webhook/*',
+        ]);
+
+        $middleware->alias([
+            'billing.active' => \App\Http\Middleware\EnforceBillingStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

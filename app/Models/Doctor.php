@@ -10,4 +10,9 @@ class Doctor extends Model
     use BelongsToTenant;
 
     protected $fillable = ['tenant_id', 'name', 'specialty'];
+
+    public function scheduleSessions()
+    {
+        return $this->hasMany(ScheduleSession::class);
+    }
 }

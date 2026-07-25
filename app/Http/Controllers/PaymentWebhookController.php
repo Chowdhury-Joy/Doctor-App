@@ -20,6 +20,11 @@ class PaymentWebhookController extends Controller
         
         Log::info("Received {$gateway} webhook", $payload);
 
+        if (!$this->verifySignature($request, $gateway)) {
+            Log::warning("Invalid signature for {$gateway} webhook");
+            return response()->json(['error' => 'Invalid signature'], 401);
+        }
+
         $serialId = $request->input('serial_id');
         $status = $request->input('status'); // VALID, FAILED, etc.
         $trxId = $request->input('trx_id');
@@ -55,5 +60,32 @@ class PaymentWebhookController extends Controller
         });
 
         return response()->json(['message' => 'Webhook processed']);
+    }
+
+    /**
+     * Verify the webhook signature based on the gateway
+     */
+    private function verifySignature(Request $request, string $gateway): bool
+    {
+        // Placeholder for actual signature verification per gateway
+        switch ($gateway) {
+            case 'bkash':
+                // e.g. check a custom header vs hash_hmac of payload
+                $signature = $request->header('X-Signature');
+                return $signature === hash_hmac('sha256', json_encode($request->all()), config('services.bkash.secret', 'dummy_secret'));
+            
+            case 'sslcommerz':
+                // e.g. check verify_sign field
+                return $request->input('verify_sign') === md5($request->input('trx_id') . config('services.sslcommerz.store_password', 'dummy_pass'));
+
+            case 'nagad':
+                // e.g. check a custom header or payload signature
+                $nagadSignature = $request->header('X-Nagad-Signature');
+                return !empty($nagadSignature); // placeholder
+            
+            default:
+                // Unknown gateways shouldn't be trusted
+                return false;
+        }
     }
 }

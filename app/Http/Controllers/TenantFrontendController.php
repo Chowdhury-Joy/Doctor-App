@@ -13,7 +13,9 @@ class TenantFrontendController extends Controller
     {
         $doctors = Doctor::with(['scheduleSessions.chamber'])->get();
         
-        return Inertia::render('Tenant/Index', [
+        $layout = tenant('layout_id') ?? 'HeroFirst';
+        
+        return Inertia::render("Tenant/Layouts/{$layout}", [
             'tenant' => tenant(),
             'doctors' => $doctors
         ]);
