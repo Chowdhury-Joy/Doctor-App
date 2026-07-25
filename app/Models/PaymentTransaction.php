@@ -9,5 +9,5 @@ class PaymentTransaction extends Model
 {
     use BelongsToTenant;
 
-    protected $fillable = ['tenant_id', 'serial_id', 'gateway', 'webhook_payload', 'verified_at'];
+    protected $fillable = ['tenant_id', 'serial_id', 'gateway', 'transaction_id', 'webhook_payload', 'verified_at'];
 }

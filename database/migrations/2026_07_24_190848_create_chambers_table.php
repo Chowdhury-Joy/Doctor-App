@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('hours')->nullable();
             
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->unique(['tenant_id', 'id']);
             $table->timestamps();
         });
     }

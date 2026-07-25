@@ -15,15 +15,14 @@ class QueueController extends Controller
     {
         $date = $request->query('date', now()->toDateString());
 
-        // Find the currently served serial (last one that went to 'in_chamber' or 'completed')
-        // Or if none, it's waiting for #1.
-        $lastServed = Serial::where('schedule_session_id', $sessionId)
+        // Find the currently served serial (active in_chamber)
+        $inChamber = Serial::where('schedule_session_id', $sessionId)
             ->where('booking_date', $date)
-            ->whereIn('status', ['in_chamber', 'completed'])
-            ->orderByDesc('serial_number')
+            ->where('status', 'in_chamber')
+            ->orderBy('serial_number')
             ->first();
 
-        $nowServing = $lastServed ? $lastServed->serial_number : 0;
+        $nowServing = $inChamber ? $inChamber->serial_number : 0;
 
         return response()->json([
             'session_id' => $sessionId,

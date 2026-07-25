@@ -100,7 +100,6 @@ class TenancyServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->bootEvents();
-        $this->mapRoutes();
 
         $this->makeTenancyMiddlewareHighestPriority();
     }
@@ -118,10 +117,7 @@ class TenancyServiceProvider extends ServiceProvider
         }
     }
 
-    protected function mapRoutes()
-    {
-        // Routes are now mapped in bootstrap/app.php for Laravel 12 compatibility
-    }
+
 
     protected function makeTenancyMiddlewareHighestPriority()
     {

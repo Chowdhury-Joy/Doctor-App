@@ -41,7 +41,7 @@ class BookingTest extends TestCase
     {
         $serial = $this->bookingService->bookSlot(
             $this->session->id,
-            '2026-08-01',
+            '2026-08-03',
             ['name' => 'John Doe', 'phone' => '1234567890']
         );
 
@@ -54,26 +54,26 @@ class BookingTest extends TestCase
 
     public function test_cannot_book_when_slot_cap_reached()
     {
-        $this->bookingService->bookSlot($this->session->id, '2026-08-01', ['name' => 'Patient 1', 'phone' => '123']);
-        $this->bookingService->bookSlot($this->session->id, '2026-08-01', ['name' => 'Patient 2', 'phone' => '123']);
+        $this->bookingService->bookSlot($this->session->id, '2026-08-03', ['name' => 'Patient 1', 'phone' => '123']);
+        $this->bookingService->bookSlot($this->session->id, '2026-08-03', ['name' => 'Patient 2', 'phone' => '123']);
         
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('No slots available for this session.');
         
-        $this->bookingService->bookSlot($this->session->id, '2026-08-01', ['name' => 'Patient 3', 'phone' => '123']);
+        $this->bookingService->bookSlot($this->session->id, '2026-08-03', ['name' => 'Patient 3', 'phone' => '123']);
     }
 
     public function test_cannot_book_on_blocked_date()
     {
         SlotBlock::create([
             'doctor_id' => $this->doctor->id,
-            'block_date' => '2026-08-01',
+            'block_date' => '2026-08-03',
             'reason' => 'Vacation'
         ]);
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('This date is blocked by the doctor.');
         
-        $this->bookingService->bookSlot($this->session->id, '2026-08-01', ['name' => 'Patient 1', 'phone' => '123']);
+        $this->bookingService->bookSlot($this->session->id, '2026-08-03', ['name' => 'Patient 1', 'phone' => '123']);
     }
 }

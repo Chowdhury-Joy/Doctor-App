@@ -9,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-    <Head :title="tenant.data.name || 'Medical Center'" />
+    <Head :title="tenant.name || 'Medical Center'" />
     
     <div class="min-h-screen bg-gray-50 flex flex-col font-sans">
         <!-- Hero Section -->
@@ -20,7 +20,7 @@ defineProps({
             
             <div class="relative z-10 max-w-4xl mx-auto">
                 <h1 class="text-5xl font-extrabold tracking-tight mb-4 drop-shadow-md">
-                    {{ tenant.data.name || 'Medical Center' }}
+                    {{ tenant.name || 'Medical Center' }}
                 </h1>
                 <p class="text-xl text-blue-100 max-w-2xl mx-auto mb-8 font-light leading-relaxed">
                     Book your appointment seamlessly and avoid the waiting room hassle. Expert care is just a few clicks away.
@@ -39,7 +39,7 @@ defineProps({
         </div>
         
         <footer class="bg-gray-900 text-gray-400 py-10 text-center mt-auto">
-            <p class="text-sm">© {{ new Date().getFullYear() }} {{ tenant.data.name || 'Medical Center' }}. All rights reserved.</p>
+            <p class="text-sm">© {{ new Date().getFullYear() }} {{ tenant.name || 'Medical Center' }}. All rights reserved.</p>
         </footer>
     </div>
 </template>

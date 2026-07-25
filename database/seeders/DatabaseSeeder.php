@@ -3,23 +3,40 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
+    // NOTE: do not add WithoutModelEvents here. The BelongsToTenant trait assigns
+    // tenant_id from a `creating` model event, so suppressing events makes every
+    // tenant-scoped insert fail the tenant_id NOT NULL constraint.
 
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory()->create([
+            'name' => 'Platform Owner',
+            'email' => 'admin@example.com',
+            'role' => 'super_admin',
+        ]);
+
+        $this->call(TenantSeeder::class);
+
+        // One tenant-admin login per demo tenant.
+        User::factory()->create([
+            'name' => 'Solo Chamber Staff',
+            'email' => 'solo@example.com',
+            'role' => 'tenant_admin',
+            'tenant_id' => 'demo-solo',
+        ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Clinic Staff',
+            'email' => 'clinic@example.com',
+            'role' => 'tenant_admin',
+            'tenant_id' => 'demo-clinic',
         ]);
     }
 }

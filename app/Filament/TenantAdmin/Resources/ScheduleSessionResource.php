@@ -5,6 +5,9 @@ namespace App\Filament\TenantAdmin\Resources;
 use App\Filament\TenantAdmin\Resources\ScheduleSessionResource\Pages;
 use App\Filament\TenantAdmin\Resources\ScheduleSessionResource\RelationManagers;
 use App\Models\ScheduleSession;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -77,12 +80,12 @@ class ScheduleSessionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

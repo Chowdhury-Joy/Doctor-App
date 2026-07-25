@@ -9,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-    <Head :title="tenant.data.name || 'Medical Center'" />
+    <Head :title="tenant.name || 'Medical Center'" />
     
     <div class="min-h-screen bg-gray-100 flex flex-col font-sans py-12 px-4 sm:px-6">
         <div class="w-full max-w-4xl mx-auto space-y-6">
@@ -19,7 +19,7 @@ defineProps({
                 
                 <div class="relative z-10 text-center sm:text-left">
                     <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-                        {{ tenant.data.name || 'Medical Center' }}
+                        {{ tenant.name || 'Medical Center' }}
                     </h1>
                     <p class="text-gray-600 text-lg">
                         Modern healthcare, simplified. Book your consultation in minutes.
@@ -37,7 +37,7 @@ defineProps({
             </div>
             
             <footer class="text-center text-gray-500 text-sm py-6">
-                © {{ new Date().getFullYear() }} {{ tenant.data.name || 'Medical Center' }}
+                © {{ new Date().getFullYear() }} {{ tenant.name || 'Medical Center' }}
             </footer>
         </div>
     </div>

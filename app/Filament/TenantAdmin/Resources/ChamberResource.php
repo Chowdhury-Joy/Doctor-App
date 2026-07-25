@@ -5,6 +5,9 @@ namespace App\Filament\TenantAdmin\Resources;
 use App\Filament\TenantAdmin\Resources\ChamberResource\Pages;
 use App\Filament\TenantAdmin\Resources\ChamberResource\RelationManagers;
 use App\Models\Chamber;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -58,12 +61,12 @@ class ChamberResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

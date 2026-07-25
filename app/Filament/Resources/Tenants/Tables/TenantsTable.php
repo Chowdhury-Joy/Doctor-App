@@ -14,7 +14,7 @@ class TenantsTable
         return $table
             ->columns([
                 \Filament\Tables\Columns\TextColumn::make('id')->searchable(),
-                \Filament\Tables\Columns\TextColumn::make('data.name')->label('Clinic Name')->searchable(),
+                \Filament\Tables\Columns\TextColumn::make('name')->label('Clinic Name'),
                 \Filament\Tables\Columns\TextColumn::make('plan_tier'),
                 \Filament\Tables\Columns\TextColumn::make('layout_id'),
                 \Filament\Tables\Columns\TextColumn::make('billing_status')

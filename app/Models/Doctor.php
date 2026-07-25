@@ -9,7 +9,7 @@ class Doctor extends Model
 {
     use BelongsToTenant;
 
-    protected $fillable = ['tenant_id', 'name', 'specialty'];
+    protected $fillable = ['tenant_id', 'name', 'photo', 'specialty', 'credentials', 'bio'];
 
     public function scheduleSessions()
     {

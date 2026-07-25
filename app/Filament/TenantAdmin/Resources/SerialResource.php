@@ -5,6 +5,10 @@ namespace App\Filament\TenantAdmin\Resources;
 use App\Filament\TenantAdmin\Resources\SerialResource\Pages;
 use App\Filament\TenantAdmin\Resources\SerialResource\RelationManagers;
 use App\Models\Serial;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -69,21 +73,23 @@ class SerialResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('booking_date', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tenant_id')
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('doctor_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('chamber_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('schedule_session_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('doctor.name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('chamber.name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('scheduleSession.session_name')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('booking_date')
                     ->date()
                     ->sortable(),
@@ -94,8 +100,23 @@ class SerialResource extends Resource
                 Tables\Columns\TextColumn::make('serial_number')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'waiting' => 'warning',
+                        'in_chamber' => 'info',
+                        'completed' => 'success',
+                        'cancelled' => 'danger',
+                        default => 'secondary',
+                    }),
                 Tables\Columns\TextColumn::make('payment_status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'paid' => 'success',
+                        'unpaid' => 'warning',
+                        'failed' => 'danger',
+                        default => 'secondary',
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('payment_reference')
                     ->searchable(),
@@ -111,30 +132,31 @@ class SerialResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\Action::make('mark_in_chamber')
+            ->recordActions([
+                Action::make('mark_in_chamber')
                     ->label('Call to Chamber')
                     ->icon('heroicon-o-arrow-right-circle')
                     ->color('warning')
                     ->visible(fn (Serial $record) => $record->status === 'waiting')
                     ->action(fn (Serial $record) => $record->update(['status' => 'in_chamber'])),
-                Tables\Actions\Action::make('mark_completed')
+                Action::make('mark_completed')
                     ->label('Mark Completed')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn (Serial $record) => $record->status === 'in_chamber')
                     ->action(fn (Serial $record) => $record->update(['status' => 'completed'])),
-                Tables\Actions\Action::make('whatsapp')
+                Action::make('whatsapp')
                     ->label('WhatsApp')
                     ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
                     ->color('success')
+                    ->visible(fn (Serial $record) => filled($record->whatsapp_link))
                     ->url(fn (Serial $record) => $record->whatsapp_link)
                     ->openUrlInNewTab(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

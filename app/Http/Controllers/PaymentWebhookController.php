@@ -37,13 +37,18 @@ class PaymentWebhookController extends Controller
             $serial = Serial::lockForUpdate()->find($serialId);
             
             if ($serial) {
-                // Record the transaction
-                PaymentTransaction::create([
-                    'serial_id' => $serial->id,
-                    'gateway' => $gateway,
-                    'webhook_payload' => json_encode($payload),
-                    'verified_at' => $status === 'VALID' ? now() : null,
-                ]);
+                // Record the transaction idempotently
+                PaymentTransaction::updateOrCreate(
+                    [
+                        'gateway' => $gateway,
+                        'transaction_id' => $trxId,
+                    ],
+                    [
+                        'serial_id' => $serial->id,
+                        'webhook_payload' => json_encode($payload),
+                        'verified_at' => $status === 'VALID' ? now() : null,
+                    ]
+                );
 
                 // Update serial status
                 if ($status === 'VALID') {
@@ -67,21 +72,26 @@ class PaymentWebhookController extends Controller
      */
     private function verifySignature(Request $request, string $gateway): bool
     {
-        // Placeholder for actual signature verification per gateway
         switch ($gateway) {
             case 'bkash':
-                // e.g. check a custom header vs hash_hmac of payload
+                $secret = config('services.bkash.secret');
+                if (empty($secret)) return false;
+                
                 $signature = $request->header('X-Signature');
-                return $signature === hash_hmac('sha256', json_encode($request->all()), config('services.bkash.secret', 'dummy_secret'));
+                return hash_equals(hash_hmac('sha256', json_encode($request->all()), $secret), (string) $signature);
             
             case 'sslcommerz':
-                // e.g. check verify_sign field
-                return $request->input('verify_sign') === md5($request->input('trx_id') . config('services.sslcommerz.store_password', 'dummy_pass'));
+                $password = config('services.sslcommerz.store_password');
+                if (empty($password)) return false;
+                
+                return $request->input('verify_sign') === md5($request->input('trx_id') . $password);
 
             case 'nagad':
-                // e.g. check a custom header or payload signature
+                $secret = config('services.nagad.secret');
+                if (empty($secret)) return false;
+                
                 $nagadSignature = $request->header('X-Nagad-Signature');
-                return !empty($nagadSignature); // placeholder
+                return hash_equals(hash_hmac('sha256', json_encode($request->all()), $secret), (string) $nagadSignature);
             
             default:
                 // Unknown gateways shouldn't be trusted

@@ -9,13 +9,13 @@ defineProps({
 </script>
 
 <template>
-    <Head :title="tenant.data.name || 'Medical Center'" />
+    <Head :title="tenant.name || 'Medical Center'" />
     
     <div class="min-h-screen bg-white text-gray-900 font-sans">
         <header class="border-b border-gray-100 py-6 px-8">
             <div class="max-w-5xl mx-auto flex justify-between items-center">
                 <h1 class="text-2xl font-semibold tracking-tight">
-                    {{ tenant.data.name || 'Medical Center' }}
+                    {{ tenant.name || 'Medical Center' }}
                 </h1>
                 <a href="#" class="text-sm font-medium text-gray-500 hover:text-black transition-colors">Contact Support</a>
             </div>

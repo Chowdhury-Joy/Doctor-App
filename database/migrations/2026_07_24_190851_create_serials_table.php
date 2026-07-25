@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('serials', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('tenant_id');
-            $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
-            $table->foreignId('chamber_id')->constrained()->onDelete('cascade');
-            $table->foreignId('schedule_session_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('doctor_id');
+            $table->unsignedBigInteger('chamber_id');
+            $table->unsignedBigInteger('schedule_session_id');
             $table->date('booking_date');
             
             $table->string('patient_name');
@@ -28,6 +28,17 @@ return new class extends Migration
             $table->string('payment_reference')->nullable();
             
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'doctor_id'])->references(['tenant_id', 'id'])->on('doctors')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'chamber_id'])->references(['tenant_id', 'id'])->on('chambers')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'schedule_session_id'])->references(['tenant_id', 'id'])->on('schedule_sessions')->onDelete('cascade');
+            $table->unique(['tenant_id', 'id']);
+
+            // Backstop against two patients being issued the same queue number for
+            // the same session on the same day (online booking vs. walk-in race).
+            $table->unique(
+                ['tenant_id', 'schedule_session_id', 'booking_date', 'serial_number'],
+                'serials_session_date_number_unique'
+            );
             $table->timestamps();
         });
     }

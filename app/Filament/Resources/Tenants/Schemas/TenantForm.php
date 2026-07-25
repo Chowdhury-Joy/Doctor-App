@@ -17,9 +17,14 @@ class TenantForm
                                 ->label('Tenant ID (Subdomain)')
                                 ->required()
                                 ->maxLength(255),
-                            \Filament\Forms\Components\TextInput::make('data.name')
+                            \Filament\Forms\Components\TextInput::make('name')
                                 ->label('Clinic Name')
                                 ->required(),
+                            \Filament\Forms\Components\TextInput::make('contact_phone')
+                                ->label('Contact / WhatsApp Number')
+                                ->tel()
+                                ->helperText('Bangladeshi format, e.g. 8801823894527.')
+                                ->default('8801823894527'),
                             \Filament\Forms\Components\Select::make('billing_status')
                                 ->options([
                                     'active' => 'Active',
@@ -45,17 +50,32 @@ class TenantForm
                                     'ClinicStyle' => 'Clinic Style',
                                 ])
                                 ->default('HeroFirst'),
-                            \Filament\Forms\Components\Select::make('data.slot_cap_type')
+                            \Filament\Forms\Components\Select::make('slot_cap_type')
                                 ->label('Slot Cap Type')
                                 ->options([
                                     'session' => 'Per Session',
                                     'day' => 'Per Day',
                                 ])
-                                ->default('session'),
-                            \Filament\Forms\Components\TextInput::make('data.daily_slot_cap')
+                                ->default('session')
+                                ->live(),
+                            \Filament\Forms\Components\TextInput::make('daily_slot_cap')
                                 ->label('Daily Slot Cap')
                                 ->numeric()
-                                ->default(20),
+                                ->minValue(1)
+                                ->default(20)
+                                ->visible(fn ($get) => $get('slot_cap_type') === 'day'),
+                            \Filament\Forms\Components\TextInput::make('theme_color')
+                                ->label('Theme Colour')
+                                ->helperText('Used for the per-tenant PWA manifest.')
+                                ->default('#0ea5e9'),
+                            \Filament\Forms\Components\Textarea::make('custom_code')
+                                ->label('Custom Code Snippets (e.g., Analytics)')
+                                ->helperText('Injected into the page head only after approval below.')
+                                ->columnSpanFull(),
+                            \Filament\Forms\Components\DateTimePicker::make('custom_code_approved_at')
+                                ->label('Custom Code Approved At')
+                                ->helperText('Leave empty to keep the snippet in draft — it will not render.')
+                                ->nullable(),
                         ]),
                 ])
             ]);

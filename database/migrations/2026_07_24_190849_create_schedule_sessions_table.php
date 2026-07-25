@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('schedule_sessions', function (Blueprint $table) {
             $table->id();
             $table->string('tenant_id');
-            $table->foreignId('chamber_id')->constrained()->onDelete('cascade');
-            $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('chamber_id');
+            $table->unsignedBigInteger('doctor_id');
             $table->tinyInteger('day_of_week'); // 0 = Sunday, 6 = Saturday
             $table->string('session_name'); // e.g. morning, evening
             $table->time('start_time')->nullable();
@@ -23,6 +23,9 @@ return new class extends Migration
             $table->integer('slot_cap');
             
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'chamber_id'])->references(['tenant_id', 'id'])->on('chambers')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'doctor_id'])->references(['tenant_id', 'id'])->on('doctors')->onDelete('cascade');
+            $table->unique(['tenant_id', 'id']);
             $table->timestamps();
         });
     }

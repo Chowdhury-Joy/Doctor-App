@@ -20,27 +20,28 @@ class CreateTenant extends CreateRecord
         $chamber = \App\Models\Chamber::create([
             'tenant_id' => $tenant->id,
             'name' => 'Main Chamber',
-            'location' => 'HQ',
-            'contact_phone' => '123456789'
+            'location' => 'HQ'
         ]);
 
         $doctor = \App\Models\Doctor::create([
             'tenant_id' => $tenant->id,
             'name' => 'Dr. John Doe',
-            'specialty' => 'General Physician',
-            'email' => 'doctor@example.com'
+            'specialty' => 'General Physician'
         ]);
 
         \App\Models\ScheduleSession::create([
             'tenant_id' => $tenant->id,
             'chamber_id' => $chamber->id,
             'doctor_id' => $doctor->id,
-            'day_of_week' => 'Monday',
+            'day_of_week' => 1, // Monday
             'session_name' => 'Morning Shift',
             'start_time' => '09:00:00',
             'end_time' => '13:00:00',
             'slot_cap' => 20
         ]);
+
+        $baseDomain = parse_url(config('app.url'), PHP_URL_HOST) ?: 'localhost';
+        $tenant->domains()->create(['domain' => "{$tenant->id}.{$baseDomain}"]);
 
         tenancy()->end();
     }

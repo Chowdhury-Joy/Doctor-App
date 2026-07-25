@@ -16,11 +16,15 @@ return new class extends Migration
             $table->string('tenant_id');
             $table->uuid('serial_id'); // foreign to serials.id
             $table->string('gateway'); // bkash, nagad, sslcommerz
+            $table->string('transaction_id')->nullable();
             $table->json('webhook_payload')->nullable();
             $table->timestamp('verified_at')->nullable();
             
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
-            $table->foreign('serial_id')->references('id')->on('serials')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'serial_id'])->references(['tenant_id', 'id'])->on('serials')->onDelete('cascade');
+            
+            // Add unique constraint for idempotency
+            $table->unique(['gateway', 'transaction_id']);
             $table->timestamps();
         });
     }

@@ -10,4 +10,14 @@ class SlotBlock extends Model
     use BelongsToTenant;
 
     protected $fillable = ['tenant_id', 'doctor_id', 'chamber_id', 'block_date', 'reason'];
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
+    public function chamber()
+    {
+        return $this->belongsTo(Chamber::class);
+    }
 }

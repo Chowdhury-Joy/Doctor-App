@@ -13,10 +13,24 @@ class TenantFrontendController extends Controller
     {
         $doctors = Doctor::with(['scheduleSessions.chamber'])->get();
         
+        $tenant = tenant();
+        $slotCapType = $tenant->slot_cap_type ?? 'session';
+        $dailyCap = (int) ($tenant->daily_slot_cap ?? 20);
+
+        // Enhance schedule sessions with available capacity
+        $doctors->each(function ($doctor) use ($slotCapType, $dailyCap) {
+            $doctor->scheduleSessions->each(function ($session) use ($slotCapType, $dailyCap) {
+                // The base cap is passed for display only; the frontend polls the
+                // availability endpoint for the remaining count on the chosen date.
+                $session->capacity = $slotCapType === 'day' ? $dailyCap : $session->slot_cap;
+                $session->cap_type = $slotCapType;
+            });
+        });
+        
         $layout = tenant('layout_id') ?? 'HeroFirst';
         
         return Inertia::render("Tenant/Layouts/{$layout}", [
-            'tenant' => tenant(),
+            'tenant' => $tenant,
             'doctors' => $doctors
         ]);
     }

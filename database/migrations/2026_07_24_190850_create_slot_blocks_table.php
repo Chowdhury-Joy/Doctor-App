@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('slot_blocks', function (Blueprint $table) {
             $table->id();
             $table->string('tenant_id');
-            $table->foreignId('doctor_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('chamber_id')->nullable()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('doctor_id')->nullable();
+            $table->unsignedBigInteger('chamber_id')->nullable();
             $table->date('block_date');
             $table->string('reason')->nullable();
             
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'doctor_id'])->references(['tenant_id', 'id'])->on('doctors')->onDelete('cascade');
+            $table->foreign(['tenant_id', 'chamber_id'])->references(['tenant_id', 'id'])->on('chambers')->onDelete('cascade');
+            $table->unique(['tenant_id', 'id']);
             $table->timestamps();
         });
     }

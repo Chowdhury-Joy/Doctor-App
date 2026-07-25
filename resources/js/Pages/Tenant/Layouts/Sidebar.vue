@@ -9,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-    <Head :title="tenant.data.name || 'Medical Center'" />
+    <Head :title="tenant.name || 'Medical Center'" />
     
     <div class="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans">
         <!-- Sidebar -->
@@ -21,11 +21,11 @@ defineProps({
             
             <div class="relative z-10">
                 <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-inner">
-                    <span class="text-3xl font-black text-blue-900">{{ (tenant.data.name || 'M')[0] }}</span>
+                    <span class="text-3xl font-black text-blue-900">{{ (tenant.name || 'M')[0] }}</span>
                 </div>
                 
                 <h1 class="text-4xl font-black mb-4 leading-tight">
-                    {{ tenant.data.name || 'Medical Center' }}
+                    {{ tenant.name || 'Medical Center' }}
                 </h1>
                 
                 <p class="text-blue-200 text-lg mb-8 opacity-90">

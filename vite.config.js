@@ -23,24 +23,11 @@ export default defineConfig({
             buildBase: '/',
             scope: '/',
             injectRegister: 'auto',
-            manifest: {
-                name: 'Doctor Appointment App',
-                short_name: 'DoctorApp',
-                description: 'Book doctor appointments easily',
-                theme_color: '#ffffff',
-                icons: [
-                    {
-                        src: '/pwa-192x192.png',
-                        sizes: '192x192',
-                        type: 'image/png'
-                    },
-                    {
-                        src: '/pwa-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png'
-                    }
-                ]
-            }
+            // The manifest is generated per tenant by the `tenant.manifest` route
+            // (name, theme colour and icons come from that tenant's branding), and
+            // linked from app.blade.php. Emitting a second static manifest here
+            // would compete with that link, so only the service worker is built.
+            manifest: false,
         })
     ],
 });

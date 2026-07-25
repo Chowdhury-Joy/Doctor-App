@@ -9,6 +9,25 @@ const props = defineProps({
 const nowServing = ref(0);
 let pollInterval = null;
 
+const currentUrl = ref('');
+const copyText = ref('Copy Link');
+
+onMounted(() => {
+    currentUrl.value = window.location.href;
+    fetchStatus();
+    pollInterval = setInterval(fetchStatus, 5000); // Poll every 5 seconds
+});
+
+const copyLink = async () => {
+    try {
+        await navigator.clipboard.writeText(currentUrl.value);
+        copyText.value = 'Copied!';
+        setTimeout(() => { copyText.value = 'Copy Link'; }, 2000);
+    } catch (e) {
+        console.error("Failed to copy", e);
+    }
+};
+
 const fetchStatus = async () => {
     try {
         const response = await fetch(`/queue/status/${props.serial.schedule_session_id}?date=${props.serial.booking_date}`);
@@ -19,10 +38,6 @@ const fetchStatus = async () => {
     }
 };
 
-onMounted(() => {
-    fetchStatus();
-    pollInterval = setInterval(fetchStatus, 5000); // Poll every 5 seconds
-});
 
 onUnmounted(() => {
     if (pollInterval) clearInterval(pollInterval);
@@ -80,6 +95,15 @@ onUnmounted(() => {
                             serial.payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                         ]">{{ serial.payment_status }}</span>
                     </div>
+                </div>
+            </div>
+            
+            <div class="px-6 pb-6">
+                <div class="mt-4 p-3 bg-gray-50 border rounded flex items-center justify-between gap-3">
+                    <input type="text" readonly :value="currentUrl" class="text-xs text-gray-500 bg-transparent border-none w-full p-0 focus:ring-0" />
+                    <button @click="copyLink" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded font-medium transition-colors shrink-0">
+                        {{ copyText }}
+                    </button>
                 </div>
             </div>
             

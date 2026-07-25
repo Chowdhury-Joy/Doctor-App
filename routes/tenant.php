@@ -26,12 +26,12 @@ Route::middleware([
     Route::get('/manifest.json', function () {
         $tenant = tenant();
         return response()->json([
-            'name' => $tenant->data['name'] ?? 'Doctor Booking',
+            'name' => $tenant->name ?? 'Doctor Booking',
             'short_name' => 'Booking',
             'start_url' => '/',
             'display' => 'standalone',
             'background_color' => '#ffffff',
-            'theme_color' => $tenant->data['theme_color'] ?? '#0ea5e9',
+            'theme_color' => $tenant->theme_color ?? '#0ea5e9',
             'icons' => [
                 [
                     'src' => '/icon-192.png',
@@ -55,6 +55,9 @@ Route::middleware([
     Route::get('/bookings/{id}', [\App\Http\Controllers\BookingController::class, 'show'])->name('booking.show');
     Route::get('/queue/status/{sessionId}', [\App\Http\Controllers\QueueController::class, 'status'])->name('queue.status');
     
+    // Availability API
+    Route::get('/api/sessions/{session}/availability', [\App\Http\Controllers\BookingController::class, 'checkAvailability'])->name('api.availability');
+
     // CSRF for webhooks is disabled in bootstrap/app.php
     Route::post('/payment/webhook/{gateway}', [\App\Http\Controllers\PaymentWebhookController::class, 'handle'])->name('payment.webhook');
 });

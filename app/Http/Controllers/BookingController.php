@@ -20,10 +20,13 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'session_id' => 'required|exists:schedule_sessions,id',
+            'session_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('schedule_sessions', 'id')->where('tenant_id', tenant('id'))
+            ],
             'date' => 'required|date|after_or_equal:today',
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => ['required', 'string', 'max:20', 'regex:/^(?:\+?88|01)?\d{11}$/'],
         ]);
 
         try {
@@ -50,5 +53,39 @@ class BookingController extends Controller
         return \Inertia\Inertia::render('Booking/Show', [
             'serial' => $serial
         ]);
+    }
+
+    public function checkAvailability(Request $request, $sessionId)
+    {
+        $request->validate(['date' => 'required|date']);
+        
+        $session = ScheduleSession::findOrFail($sessionId);
+        
+        $tenant = tenant();
+        $slotCapType = $tenant->slot_cap_type ?? 'session';
+        $dailyCap = (int) ($tenant->daily_slot_cap ?? 20);
+        
+        $date = $request->input('date');
+
+        if ($slotCapType === 'day') {
+            $existingBookingsCount = Serial::where('booking_date', $date)
+                ->where('status', '!=', 'cancelled')
+                ->count();
+            return response()->json([
+                'booked' => $existingBookingsCount,
+                'capacity' => $dailyCap,
+                'available' => max(0, $dailyCap - $existingBookingsCount)
+            ]);
+        } else {
+            $sessionBookingsCount = Serial::where('schedule_session_id', $session->id)
+                ->where('booking_date', $date)
+                ->where('status', '!=', 'cancelled')
+                ->count();
+            return response()->json([
+                'booked' => $sessionBookingsCount,
+                'capacity' => $session->slot_cap,
+                'available' => max(0, $session->slot_cap - $sessionBookingsCount)
+            ]);
+        }
     }
 }
