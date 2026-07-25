@@ -10,7 +10,7 @@ class Serial extends Model
 {
     use HasUuids, BelongsToTenant;
 
-    protected $fillable = ['id', 'tenant_id', 'doctor_id', 'chamber_id', 'schedule_session_id', 'booking_date', 'patient_name', 'patient_phone', 'serial_number', 'status', 'payment_status', 'payment_reference'];
+    protected $fillable = ['id', 'tenant_id', 'doctor_id', 'chamber_id', 'bookable_type', 'bookable_id', 'booking_date', 'patient_name', 'patient_phone', 'serial_number', 'status', 'payment_status', 'payment_reference'];
 
     /**
      * The patient's phone in wa.me format (88XXXXXXXXXXX), or null if unusable.
@@ -60,8 +60,8 @@ class Serial extends Model
         return $this->belongsTo(Chamber::class);
     }
 
-    public function scheduleSession()
+    public function bookable()
     {
-        return $this->belongsTo(ScheduleSession::class);
+        return $this->morphTo();
     }
 }

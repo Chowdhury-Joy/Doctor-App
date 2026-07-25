@@ -7,8 +7,10 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateTenant extends CreateRecord
 {
-    use \Filament\Resources\Pages\CreateRecord\Concerns\HasWizard;
-
+    // The wizard is defined in TenantForm's own schema (Filament\Schemas\Components\Wizard),
+    // not via this page's HasWizard concern. HasWizard::form() replaces the resource's
+    // entire form with Wizard::make($this->getSteps()) — since getSteps() defaults to an
+    // empty array here, using both together silently rendered a wizard with zero steps.
     protected static string $resource = TenantResource::class;
 
     protected function afterCreate(): void

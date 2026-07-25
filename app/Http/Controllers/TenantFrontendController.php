@@ -27,9 +27,9 @@ class TenantFrontendController extends Controller
             });
         });
         
-        $layout = tenant('layout_id') ?? 'HeroFirst';
+        $component = \App\Services\ThemeService::resolveLandingComponent($tenant);
         
-        return Inertia::render("Tenant/Layouts/{$layout}", [
+        return Inertia::render($component, [
             'tenant' => $tenant,
             'doctors' => $doctors
         ]);

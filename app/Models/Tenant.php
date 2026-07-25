@@ -29,6 +29,8 @@ class Tenant extends BaseTenant
             'billing_status',
             'plan_tier',
             'feature_flags',
+            'theme_name',
+            'payment_gateway_secret',
         ];
     }
 
@@ -37,6 +39,30 @@ class Tenant extends BaseTenant
         return [
             'custom_code_approved_at' => 'datetime',
             'feature_flags' => 'array',
+            'payment_gateway_secret' => 'encrypted',
         ];
+    }
+
+    public function canHaveMultipleDoctors(): bool
+    {
+        return $this->hasCapability('multiple_doctors', fn() => $this->plan_tier === 'clinic');
+    }
+
+    public function canHaveMultipleChambers(): bool
+    {
+        return $this->hasCapability('multiple_chambers', fn() => $this->plan_tier === 'clinic');
+    }
+
+    public function canUseLabTests(): bool
+    {
+        return $this->hasCapability('lab_tests', fn() => $this->plan_tier === 'clinic');
+    }
+
+    public function hasCapability(string $flag, callable $defaultRule): bool
+    {
+        if (is_array($this->feature_flags) && array_key_exists($flag, $this->feature_flags)) {
+            return (bool) $this->feature_flags[$flag];
+        }
+        return $defaultRule();
     }
 }

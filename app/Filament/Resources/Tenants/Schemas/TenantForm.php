@@ -37,10 +37,24 @@ class TenantForm
                         ->schema([
                             \Filament\Forms\Components\Select::make('plan_tier')
                                 ->options([
-                                    'basic' => 'Basic',
-                                    'premium' => 'Premium',
+                                    'solo' => 'Solo',
+                                    'clinic' => 'Clinic',
                                 ])
-                                ->default('basic'),
+                                ->default('solo')
+                                ->rule(static function (?\App\Models\Tenant $record) {
+                                    return function (string $attribute, $value, \Closure $fail) use ($record) {
+                                        if ($value === 'solo' && $record) {
+                                            $doctorCount = \App\Models\Doctor::where('tenant_id', $record->id)->count();
+                                            if ($doctorCount > 1) {
+                                                $fail('Cannot downgrade to Solo tier: tenant has multiple doctors.');
+                                            }
+                                            $chamberCount = \App\Models\Chamber::where('tenant_id', $record->id)->count();
+                                            if ($chamberCount > 1) {
+                                                $fail('Cannot downgrade to Solo tier: tenant has multiple chambers.');
+                                            }
+                                        }
+                                    };
+                                }),
                             \Filament\Forms\Components\Select::make('layout_id')
                                 ->options([
                                     'HeroFirst' => 'Hero First',
@@ -50,6 +64,16 @@ class TenantForm
                                     'ClinicStyle' => 'Clinic Style',
                                 ])
                                 ->default('HeroFirst'),
+                            \Filament\Forms\Components\TextInput::make('theme_name')
+                                ->label('Bespoke Theme Name')
+                                ->placeholder('e.g., dr-bespoke-v1')
+                                ->helperText('Leave blank to use standard layouts.')
+                                ->maxLength(50),
+                            \Filament\Forms\Components\TextInput::make('payment_gateway_secret')
+                                ->label('Payment Gateway Secret')
+                                ->password()
+                                ->helperText('Used for HMAC-SHA256 webhook signature verification.')
+                                ->maxLength(255),
                             \Filament\Forms\Components\Select::make('slot_cap_type')
                                 ->label('Slot Cap Type')
                                 ->options([

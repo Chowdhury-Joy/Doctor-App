@@ -68,34 +68,30 @@ class PaymentWebhookController extends Controller
     }
 
     /**
-     * Verify the webhook signature based on the gateway
+     * Verify the webhook signature using HMAC-SHA256.
+     * Assumes payload has a 'signature' field.
      */
     private function verifySignature(Request $request, string $gateway): bool
     {
-        switch ($gateway) {
-            case 'bkash':
-                $secret = config('services.bkash.secret');
-                if (empty($secret)) return false;
-                
-                $signature = $request->header('X-Signature');
-                return hash_equals(hash_hmac('sha256', json_encode($request->all()), $secret), (string) $signature);
-            
-            case 'sslcommerz':
-                $password = config('services.sslcommerz.store_password');
-                if (empty($password)) return false;
-                
-                return $request->input('verify_sign') === md5($request->input('trx_id') . $password);
-
-            case 'nagad':
-                $secret = config('services.nagad.secret');
-                if (empty($secret)) return false;
-                
-                $nagadSignature = $request->header('X-Nagad-Signature');
-                return hash_equals(hash_hmac('sha256', json_encode($request->all()), $secret), (string) $nagadSignature);
-            
-            default:
-                // Unknown gateways shouldn't be trusted
-                return false;
+        $tenant = tenant();
+        if (!$tenant || empty($tenant->payment_gateway_secret)) {
+            return false;
         }
+
+        $signature = $request->input('signature');
+        if (empty($signature)) {
+            return false;
+        }
+
+        // Standard verification: collect all fields except signature
+        $payload = $request->except('signature');
+        
+        // Sort keys alphabetically to ensure consistent payload representation
+        ksort($payload);
+        $dataToSign = json_encode($payload);
+
+        $expectedSignature = hash_hmac('sha256', $dataToSign, $tenant->payment_gateway_secret);
+
+        return hash_equals($expectedSignature, (string) $signature);
     }
 }

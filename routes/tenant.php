@@ -49,15 +49,22 @@ Route::middleware([
 
     Route::get('/', [\App\Http\Controllers\TenantFrontendController::class, 'index'])->name('tenant.index');
 
+    Route::get('/book', [\App\Http\Controllers\BookingController::class, 'create'])->name('booking.create');
     Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])
         ->middleware(['throttle:5,1', 'billing.active'])
         ->name('booking.store');
     Route::get('/bookings/{id}', [\App\Http\Controllers\BookingController::class, 'show'])->name('booking.show');
-    Route::get('/queue/status/{sessionId}', [\App\Http\Controllers\QueueController::class, 'status'])->name('queue.status');
+    Route::get('/queue/status', [\App\Http\Controllers\QueueController::class, 'status'])->name('queue.status');
     
     // Availability API
-    Route::get('/api/sessions/{session}/availability', [\App\Http\Controllers\BookingController::class, 'checkAvailability'])->name('api.availability');
+    Route::get('/api/availability', [\App\Http\Controllers\BookingController::class, 'checkAvailability'])->name('api.availability');
 
     // CSRF for webhooks is disabled in bootstrap/app.php
     Route::post('/payment/webhook/{gateway}', [\App\Http\Controllers\PaymentWebhookController::class, 'handle'])->name('payment.webhook');
+
+    Route::post('/locale', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate(['locale' => 'required|in:en,bn']);
+        session(['locale' => $validated['locale']]);
+        return back();
+    })->name('locale.switch');
 });

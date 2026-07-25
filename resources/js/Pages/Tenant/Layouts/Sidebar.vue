@@ -1,6 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import BookingWidget from '@/Components/BookingWidget.vue';
+import SectionRenderer from '@/Components/SectionRenderer.vue';
 
 defineProps({
     tenant: Object,
@@ -11,48 +12,55 @@ defineProps({
 <template>
     <Head :title="tenant.name || 'Medical Center'" />
     
-    <div class="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans">
-        <!-- Sidebar -->
-        <div class="md:w-1/3 lg:w-1/4 bg-blue-900 text-white p-10 flex flex-col justify-between shadow-2xl z-10 relative">
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div class="absolute -top-32 -left-32 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-                <div class="absolute top-1/2 -right-32 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-            </div>
-            
-            <div class="relative z-10">
-                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-inner">
-                    <span class="text-3xl font-black text-blue-900">{{ (tenant.name || 'M')[0] }}</span>
+    <div class="min-h-screen flex flex-col md:flex-row font-sans bg-gray-50">
+        <!-- Sidebar Navigation / Identity -->
+        <aside class="w-full md:w-80 bg-slate-900 text-white flex flex-col min-h-[30vh] md:min-h-screen shadow-xl z-10 shrink-0">
+            <div class="p-8 flex-grow">
+                <div class="w-16 h-16 bg-blue-500 rounded-xl mb-6 shadow-lg flex items-center justify-center text-2xl font-bold">
+                    {{ (tenant.name || 'M').charAt(0) }}
                 </div>
                 
-                <h1 class="text-4xl font-black mb-4 leading-tight">
+                <h1 class="text-3xl font-bold tracking-tight mb-2">
                     {{ tenant.name || 'Medical Center' }}
                 </h1>
                 
-                <p class="text-blue-200 text-lg mb-8 opacity-90">
-                    Your health is our priority. Schedule your visit with our specialists today.
+                <p class="text-slate-400 mb-8 font-light">
+                    {{ tenant.tagline || 'Excellence in healthcare.' }}
                 </p>
                 
                 <div class="space-y-4">
+                    <a href="#booking" class="block w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 text-center rounded-lg font-medium transition-colors">
+                        {{ __('Book Appointment') }}
+                    </a>
+                </div>
+                
+                <div class="mt-12 space-y-4 text-sm text-slate-400">
                     <div class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <div>
-                            <p class="font-bold text-sm">Opening Hours</p>
-                            <p class="text-blue-200 text-sm">Mon-Sun: 8AM - 10PM</p>
-                        </div>
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <p>{{ __('Main Clinic, Dhaka') }}</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <p>{{ tenant.contact_phone || '8801823894527' }}</p>
                     </div>
                 </div>
             </div>
             
-            <div class="relative z-10 mt-12 pt-8 border-t border-blue-800/50">
-                <p class="text-xs text-blue-400">© {{ new Date().getFullYear() }} Powered by DoctorApp</p>
+            <div class="p-8 text-xs text-slate-500 border-t border-slate-800">
+                &copy; {{ new Date().getFullYear() }} {{ tenant.name || 'Medical Center' }}
             </div>
-        </div>
+        </aside>
 
-        <!-- Main Content -->
-        <div class="md:w-2/3 lg:w-3/4 p-6 md:p-12 lg:p-16 flex items-center overflow-y-auto">
-            <div class="w-full max-w-2xl mx-auto">
-                <BookingWidget :tenant="tenant" :doctors="doctors" />
-            </div>
-        </div>
+        <!-- Main Content Area -->
+        <main class="flex-grow flex flex-col relative h-screen overflow-y-auto">
+            <SectionRenderer :tenant="tenant" :doctors="doctors">
+                <!-- Hide redundant sections -->
+                <template #hero><div></div></template>
+                <template #contact><div></div></template>
+                <template #footer><div></div></template>
+                
+                <!-- Default sections will be rendered -->
+            </SectionRenderer>
+        </main>
     </div>
 </template>

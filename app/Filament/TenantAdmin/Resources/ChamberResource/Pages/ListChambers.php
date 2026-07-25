@@ -12,8 +12,12 @@ class ListChambers extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        $canCreate = tenant()->canHaveMultipleChambers() || \App\Models\Chamber::count() === 0;
+
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->disabled(! $canCreate)
+                ->tooltip($canCreate ? null : 'Solo tier is limited to a single chamber. Upgrade to add more.'),
         ];
     }
 }
